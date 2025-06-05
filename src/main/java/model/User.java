@@ -5,6 +5,7 @@ public abstract class User {
     private String name;
     private String address;
     protected double balance;
+    private int id;
 
     // Constructor protected (doar pentru subclase)
     protected User(String name, String address, double initialBalance) {
@@ -26,6 +27,14 @@ public abstract class User {
             throw new IllegalArgumentException("Suma trebuie sa fie pozitiva");
         }
         balance += amount;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() { return name; }

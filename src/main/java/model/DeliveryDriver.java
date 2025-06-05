@@ -7,6 +7,8 @@ public abstract class DeliveryDriver {
     private String vehicleType;
     private int currentLoad;
     private final int maxCapacity;
+    private int id;
+
 
     public DeliveryDriver(String name, String vehicleType, int maxCapacity) {
         this.name = name;
@@ -37,6 +39,14 @@ public abstract class DeliveryDriver {
             throw new IllegalStateException("Nu exista comenzi de finalizat");
         }
         currentLoad--;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() { return name; }

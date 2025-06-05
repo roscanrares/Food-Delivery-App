@@ -2,6 +2,8 @@ package dao;
 
 import model.*;
 import exception.InsufficientFundsException;
+import service.AuditService;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,10 @@ public class UserDAO {
                 stmt.setNull(5, Types.DOUBLE);
             }
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "UserDAO", "addUser", "name=" + user.getName() + ",type=" + (user instanceof PremiumUser ? "premium" : "regular")
+            );
         }
     }
 
@@ -43,6 +49,10 @@ public class UserDAO {
                 users.add(mapRowToUser(rs));
             }
         }
+        // AUDIT
+        AuditService.getInstance().logDAOAction(
+                "UserDAO", "getAllUsers", "all"
+        );
         return users;
     }
 
@@ -53,6 +63,10 @@ public class UserDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    // AUDIT
+                    AuditService.getInstance().logDAOAction(
+                            "UserDAO", "getUserById", "id=" + id
+                    );
                     return mapRowToUser(rs);
                 }
             }
@@ -76,6 +90,10 @@ public class UserDAO {
             }
             stmt.setInt(6, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "UserDAO", "updateUser", "id=" + id + ",name=" + user.getName()
+            );
         }
     }
 
@@ -85,6 +103,10 @@ public class UserDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "UserDAO", "deleteUser", "id=" + id
+            );
         }
     }
 

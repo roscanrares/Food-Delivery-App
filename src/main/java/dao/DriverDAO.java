@@ -1,6 +1,8 @@
 package dao;
 
 import model.*;
+import service.AuditService;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,10 @@ public class DriverDAO {
                 stmt.setNull(6, Types.VARCHAR);
             }
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "DriverDAO", "addDriver", "name=" + driver.getName() + ",vehicleType=" + driver.getVehicleType()
+            );
         }
     }
 
@@ -46,6 +52,10 @@ public class DriverDAO {
                 drivers.add(mapRowToDriver(rs));
             }
         }
+        // AUDIT
+        AuditService.getInstance().logDAOAction(
+                "DriverDAO", "getAllDrivers", "all"
+        );
         return drivers;
     }
 
@@ -56,6 +66,10 @@ public class DriverDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    // AUDIT doar dacă există driver găsit
+                    AuditService.getInstance().logDAOAction(
+                            "DriverDAO", "getDriverById", "id=" + id
+                    );
                     return mapRowToDriver(rs);
                 }
             }
@@ -84,6 +98,10 @@ public class DriverDAO {
             }
             stmt.setInt(7, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "DriverDAO", "updateDriver", "id=" + id + ",name=" + driver.getName()
+            );
         }
     }
 
@@ -93,6 +111,10 @@ public class DriverDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "DriverDAO", "deleteDriver", "id=" + id
+            );
         }
     }
 
@@ -106,7 +128,6 @@ public class DriverDAO {
         switch (vehicleType) {
             case "Masina":
                 CarDriver car = new CarDriver(name, rs.getString("car_model"));
-                // setare currentLoad dacă e nevoie (poți adăuga un setter în CarDriver/DeliveryDriver)
                 for (int i = 0; i < currentLoad; i++) car.acceptOrder();
                 return car;
             case "Scuter":
@@ -114,7 +135,6 @@ public class DriverDAO {
                 for (int i = 0; i < currentLoad; i++) scooter.acceptOrder();
                 return scooter;
             default:
-                // fallback generic dacă adaugi alt tip de driver
                 throw new IllegalArgumentException("Unknown vehicle type: " + vehicleType);
         }
     }

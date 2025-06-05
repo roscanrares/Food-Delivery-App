@@ -1,6 +1,8 @@
 package dao;
 
 import model.*;
+import service.AuditService;
+
 import java.sql.*;
 import java.util.*;
 
@@ -32,6 +34,10 @@ public class OrderDAO {
                 if (keys.next()) {
                     int orderId = keys.getInt(1);
                     addOrderItems(orderId, order.getItems());
+                    // AUDIT
+                    AuditService.getInstance().logDAOAction(
+                            "OrderDAO", "addOrder", "id=" + orderId + ",user_id=" + order.getUser().getId() + ",restaurant_id=" + order.getRestaurant().getId()
+                    );
                 }
             }
         }
@@ -46,6 +52,10 @@ public class OrderDAO {
                 stmt.addBatch();
             }
             stmt.executeBatch();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "OrderDAO", "addOrderItems", "order_id=" + orderId + ",items=" + items
+            );
         }
     }
 
@@ -59,6 +69,10 @@ public class OrderDAO {
                 orders.add(mapRowToOrder(rs));
             }
         }
+        // AUDIT
+        AuditService.getInstance().logDAOAction(
+                "OrderDAO", "getAllOrders", "all"
+        );
         return orders;
     }
 
@@ -69,6 +83,10 @@ public class OrderDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    // AUDIT
+                    AuditService.getInstance().logDAOAction(
+                            "OrderDAO", "getOrderById", "id=" + id
+                    );
                     return mapRowToOrder(rs);
                 }
             }
@@ -87,6 +105,10 @@ public class OrderDAO {
             stmt.setBoolean(5, order.isPaid());
             stmt.setInt(6, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "OrderDAO", "updateOrder", "id=" + id + ",user_id=" + order.getUser().getId()
+            );
         }
         // Poți actualiza și order_items aici dacă se modifică
     }
@@ -98,12 +120,20 @@ public class OrderDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql1)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "OrderDAO", "deleteOrderItems", "order_id=" + id
+            );
         }
         // Apoi comanda
         String sql2 = "DELETE FROM orders WHERE id=?";
         try (PreparedStatement stmt = conn.prepareStatement(sql2)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "OrderDAO", "deleteOrder", "id=" + id
+            );
         }
     }
 

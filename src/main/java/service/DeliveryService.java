@@ -1,22 +1,49 @@
 package service;
 
-class DeliveryService {
-    private List<User> users = new ArrayList<>();
-    private List<Restaurant> restaurants = new ArrayList<>();
-    private List<DeliveryDriver> drivers = new ArrayList<>();
-    private List<Order> orders = new ArrayList<>();
+import exception.*;
+import model.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class DeliveryService {
+    private final List<User> users = new ArrayList<>();
+    private final List<Restaurant> restaurants = new ArrayList<>();
+    private final List<DeliveryDriver> drivers = new ArrayList<>();
+    private final List<Order> orders = new ArrayList<>();
+
+    // --- User Methods ---
 
     public List<User> getUsers() {
-        return users;
+        return new ArrayList<>(users);
     }
 
     public void addUser(User user) {
         users.add(user);
     }
 
+    public User getUserByName(String userName) {
+        return users.stream()
+                .filter(u -> u.getName().equals(userName))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("User", userName));
+    }
+
+    // --- Restaurant Methods ---
+
     public void addRestaurant(Restaurant restaurant) {
         restaurants.add(restaurant);
     }
+
+    public Restaurant getRestaurantByName(String restaurantName) {
+        return restaurants.stream()
+                .filter(r -> r.getName().equals(restaurantName))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Restaurant", restaurantName));
+    }
+
+    // --- Driver Methods ---
 
     public void addDriver(DeliveryDriver driver) {
         drivers.add(driver);
@@ -26,61 +53,73 @@ class DeliveryService {
         return drivers.stream()
                 .filter(DeliveryDriver::isAvailable)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("DeliveryDriver", "No available driver"));
+    }
+
+    // --- Order Methods ---
+
+    public void placeOrder(String userName, String restaurantName, List<String> items) {
+        User user = getUserByName(userName);
+        Restaurant restaurant = getRestaurantByName(restaurantName);
+        DeliveryDriver driver = assignDriver();
+
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("Lista de produse nu poate fi goală.");
+        }
+
+        try {
+            Order order = new Order(user, restaurant, items, driver);
+            order.processPayment();
+            driver.acceptOrder();
+            orders.add(order);
+            // Mesajele de succes pot fi returnate sau logate, nu printate direct!
+        } catch (MenuItemNotFoundException | InsufficientBalanceException |
+                 DriverCapacityExceededException | OrderAlreadyPaidException e) {
+            // Poți loga, returna mesajul către UI, sau arunca mai departe
+            throw e;
+        }
     }
 
     public void completeDelivery(Order order) {
         order.getDriver().completeOrder();
-        System.out.println("Comanda livrata de " + order.getDriver().getName() +
-                ". Comenzi active: " + order.getDriver().getCurrentLoad());
+        // Poți loga sau returna mesajul de livrare către UI
     }
 
-    public void placeOrder(String userName, String restaurantName, List<String> items) {
-        User user = users.stream()
-                .filter(u -> u.getName().equals(userName))
-                .findFirst()
-                .orElse(null);
-
-        Restaurant restaurant = restaurants.stream()
-                .filter(r -> r.getName().equals(restaurantName))
-                .findFirst()
-                .orElse(null);
-
-        DeliveryDriver driver = assignDriver();
-
-        if (user != null && restaurant != null && driver != null) {
-            try {
-                Order order = new Order(user, restaurant, items, driver);
-
-                order.processPayment();
-                driver.acceptOrder();
-                orders.add(order);
-
-                System.out.println("\nComanda plasata cu succes!");
-                System.out.println("Client: " + user.getName());
-                System.out.println("Sold ramas: " + user.getBalance() + " lei");
-                System.out.println("Restaurant: " + restaurant.getName());
-                System.out.println("Livrator: " + driver.getName());
-                System.out.println("Total platit: " + order.getTotalPrice() + " lei");
-            } catch (InsufficientFundsException e) {
-                System.out.println("Eroare la plata: " + e.getMessage());
-            } catch (IllegalStateException e) {
-                System.out.println("Eroare: " + e.getMessage());
-            }
-        } else {
-            System.out.println("Nu s-a putut plasa comanda. Verificati disponibilitatea!");
-        }
+    public List<Order> getOrdersForUser(String userName) {
+        return orders.stream()
+                .filter(o -> o.getUser().getName().equals(userName))
+                .toList();
     }
+
+    public List<Order> getActiveOrdersForDriver(String driverName) {
+        return orders.stream()
+                .filter(o -> o.getDriver().getName().equals(driverName) && !o.isPaid())
+                .toList();
+    }
+
+    // --- Menu Display ---
 
     public void displayMenu(String restaurantName) {
-        restaurants.stream()
-                .filter(r -> r.getName().equals(restaurantName))
-                .findFirst()
-                .ifPresent(r -> {
-                    System.out.println("\nMeniu " + r.getType() + " " + r.getName());
-                    System.out.println("----------------------------------");
-                    r.getMenu().forEach((item, price) ->
-                            System.out.printf("- %s: %.2f lei%n", item, price));
-                });
+        Restaurant restaurant = getRestaurantByName(restaurantName);
+        System.out.println("\nMeniu " + restaurant.getType() + " " + restaurant.getName());
+        System.out.println("----------------------------------");
+        restaurant.getMenu().forEach((item, price) ->
+                System.out.printf("- %s: %.2f lei%n", item, price));
     }
+
+    // --- List Management (for tests or UI) ---
+
+    public List<Restaurant> getRestaurants() {
+        return new ArrayList<>(restaurants);
+    }
+
+    public List<DeliveryDriver> getDrivers() {
+        return new ArrayList<>(drivers);
+    }
+
+    public List<Order> getOrders() {
+        return new ArrayList<>(orders);
+    }
+
+    // --- If scaling to DB, replace lists with DAO fields and forward calls! ---
 }

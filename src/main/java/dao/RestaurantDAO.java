@@ -1,6 +1,8 @@
 package dao;
 
 import model.*;
+import service.AuditService;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,10 @@ public class RestaurantDAO {
                 stmt.setNull(3, Types.VARCHAR);
             }
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "RestaurantDAO", "addRestaurant", "name=" + restaurant.getName() + ",type=" + restaurant.getType()
+            );
         }
         // Opțional: poți salva și meniul în altă masă (ex: restaurant_menu)
     }
@@ -40,6 +46,10 @@ public class RestaurantDAO {
                 restaurants.add(mapRowToRestaurant(rs));
             }
         }
+        // AUDIT
+        AuditService.getInstance().logDAOAction(
+                "RestaurantDAO", "getAllRestaurants", "all"
+        );
         return restaurants;
     }
 
@@ -50,6 +60,10 @@ public class RestaurantDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    // AUDIT
+                    AuditService.getInstance().logDAOAction(
+                            "RestaurantDAO", "getRestaurantById", "id=" + id
+                    );
                     return mapRowToRestaurant(rs);
                 }
             }
@@ -70,6 +84,10 @@ public class RestaurantDAO {
             }
             stmt.setInt(4, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "RestaurantDAO", "updateRestaurant", "id=" + id + ",name=" + restaurant.getName()
+            );
         }
     }
 
@@ -79,6 +97,10 @@ public class RestaurantDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
+            // AUDIT
+            AuditService.getInstance().logDAOAction(
+                    "RestaurantDAO", "deleteRestaurant", "id=" + id
+            );
         }
     }
 
@@ -100,5 +122,4 @@ public class RestaurantDAO {
         }
     }
 
-    // (Opțional) Metode pentru gestionarea meniului separat, dacă ai un tabel restaurant_menu
 }

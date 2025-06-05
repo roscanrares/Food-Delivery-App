@@ -6,6 +6,15 @@ public abstract class Restaurant {
     private String name;
     protected TreeMap<String, Double> menu;
     private String type;
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public Restaurant(String name, String type) {
         this.name = name;
