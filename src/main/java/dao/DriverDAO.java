@@ -127,10 +127,12 @@ public class DriverDAO {
 
         switch (vehicleType) {
             case "Masina":
+            case "Car": // Acceptă și "Car" pentru compatibilitate cu date vechi sau străine
                 CarDriver car = new CarDriver(name, rs.getString("car_model"));
                 for (int i = 0; i < currentLoad; i++) car.acceptOrder();
                 return car;
             case "Scuter":
+            case "Scooter": // Acceptă și "Scooter" dacă apar date englezești
                 ScooterDriver scooter = new ScooterDriver(name, rs.getString("license_plate"));
                 for (int i = 0; i < currentLoad; i++) scooter.acceptOrder();
                 return scooter;
