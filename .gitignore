@@ -28,5 +28,7 @@ bin/
 # Maven target directory
 /target/
 
+/audit.csv
+
 ### Mac OS ###
 .DS_Store

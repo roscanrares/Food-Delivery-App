@@ -1,7 +1,6 @@
 package app;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
@@ -10,11 +9,13 @@ import model.User;
 import model.PremiumUser;
 import model.RegularUser;
 import dao.UserDAO;
+import db.DBConnection; // Adaugă acest import!!
 
 public class FoodDeliveryPlatform {
     public static void main(String[] args) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/yourdb", "user", "password");
+            // Folosește clasa ta DBConnection!
+            Connection conn = DBConnection.getConnection();
             UserDAO userDAO = new UserDAO(conn); // Pass connection
 
             List<User> users = new ArrayList<>();
