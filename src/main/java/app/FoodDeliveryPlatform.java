@@ -7,7 +7,7 @@ import model.User;
 import model.PremiumUser;
 import model.RegularUser;
 
-class FoodDeliveryPlatform {
+public class FoodDeliveryPlatform {
     public static void main(String[] args) {
 
         List<User> users = new ArrayList<>();
