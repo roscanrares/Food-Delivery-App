@@ -1,3 +1,5 @@
+package app;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -5,7 +7,7 @@ public class TestConnection {
     public static void main(String[] args) {
         String url = "jdbc:postgresql://localhost:5432/fooddelivery";
         String user = "postgres";
-        String password = "parola_ta_aici"; // Înlocuiește cu parola ta
+        String password = "password"; // Înlocuiește cu parola ta
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             if (conn != null) {
