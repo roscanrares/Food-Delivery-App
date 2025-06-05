@@ -1,5 +1,7 @@
 package model;
 
+import exception.DriverCapacityExceededException;
+
 public abstract class DeliveryDriver {
     private String name;
     private String vehicleType;
@@ -24,7 +26,7 @@ public abstract class DeliveryDriver {
     // Acceptă o comandă nouă (crește sarcina curentă)
     public void acceptOrder() {
         if (!isAvailable()) {
-            throw new IllegalStateException("Livratorul a atins capacitatea maxima");
+            throw new DriverCapacityExceededException(getName());
         }
         currentLoad++;
     }

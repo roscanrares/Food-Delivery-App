@@ -1,5 +1,8 @@
 package model;
 
+import exception.MenuItemNotFoundException;
+import exception.OrderAlreadyPaidException;
+import exception.InsufficientBalanceException;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +28,7 @@ public class Order {
                 .mapToDouble(item -> {
                     Double price = restaurant.getMenu().get(item);
                     if (price == null) {
-                        throw new IllegalArgumentException("Itemul " + item + " nu există în meniu");
+                        throw new MenuItemNotFoundException(item);
                     }
                     return price;
                 })
@@ -38,10 +41,10 @@ public class Order {
 
     public void processPayment() {
         if (isPaid) {
-            throw new IllegalStateException("Comanda a fost deja platita");
+            throw new OrderAlreadyPaidException();
         }
         if (user.getBalance() < totalPrice) {
-            throw new IllegalStateException("Fonduri insuficiente");
+            throw new InsufficientBalanceException(totalPrice, user.getBalance());
         }
         user.deductBalance(totalPrice);
         isPaid = true;
