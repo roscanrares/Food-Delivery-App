@@ -25,5 +25,8 @@ bin/
 ### VS Code ###
 .vscode/
 
+# Maven target directory
+/target/
+
 ### Mac OS ###
 .DS_Store
