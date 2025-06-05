@@ -1,6 +1,6 @@
 package model;
 
-class PremiumUser extends User {
+public class PremiumUser extends User {
     private double discount;
 
     public PremiumUser(String name, String address, double initialBalance, double discount) {
@@ -9,4 +9,9 @@ class PremiumUser extends User {
     }
 
     public double getDiscount() { return discount; }
+
+    // Opțional
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
 }

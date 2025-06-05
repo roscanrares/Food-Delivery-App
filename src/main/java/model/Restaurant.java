@@ -1,6 +1,8 @@
 package model;
 
-abstract class Restaurant {
+import java.util.TreeMap;
+
+public abstract class Restaurant {
     private String name;
     protected TreeMap<String, Double> menu;
     private String type;

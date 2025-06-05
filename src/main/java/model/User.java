@@ -1,11 +1,13 @@
 package model;
+import exception.InsufficientFundsException;
 
-abstract class User {
+public abstract class User {
     private String name;
     private String address;
     protected double balance;
 
-    public User(String name, String address, double initialBalance) {
+    // Constructor protected (doar pentru subclase)
+    protected User(String name, String address, double initialBalance) {
         this.name = name;
         this.address = address;
         this.balance = initialBalance;
@@ -29,4 +31,6 @@ abstract class User {
     public String getName() { return name; }
     public String getAddress() { return address; }
     public double getBalance() { return balance; }
+
+    // Poți adăuga și setteri dacă vrei să poți modifica name/address ulterior
 }

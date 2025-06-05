@@ -1,6 +1,6 @@
 package model;
 
-abstract class DeliveryDriver {
+public abstract class DeliveryDriver {
     private String name;
     private String vehicleType;
     private int currentLoad;
@@ -13,12 +13,15 @@ abstract class DeliveryDriver {
         this.currentLoad = 0;
     }
 
+    // Metodă abstractă pentru calculul timpului de livrare (implementată în subclase)
     public abstract double calculateDeliveryTime(double distance);
 
+    // Verifică dacă livratorul poate prelua o comandă nouă
     public boolean isAvailable() {
         return currentLoad < maxCapacity;
     }
 
+    // Acceptă o comandă nouă (crește sarcina curentă)
     public void acceptOrder() {
         if (!isAvailable()) {
             throw new IllegalStateException("Livratorul a atins capacitatea maxima");
@@ -26,6 +29,7 @@ abstract class DeliveryDriver {
         currentLoad++;
     }
 
+    // Marchează o comandă ca finalizată (scade sarcina curentă)
     public void completeOrder() {
         if (currentLoad <= 0) {
             throw new IllegalStateException("Nu exista comenzi de finalizat");
