@@ -2,6 +2,8 @@
 
 A Java-based application for food delivery management, structured with a clear separation between models, data access, services, and database connectivity.
 
+
+The project’s objective is to serve as a comprehensive exercise in mastering object-oriented programming (OOP) paradigms, allowing me to translate theoretical principles into concrete, maintainable code architectures. By modeling entities, relationships, and business logic according to OOP best practices, I am able to explore the power of abstraction, code reuse, and flexibility. Moreover, by connecting the application to a relational database, I gain practical experience in data persistence and real-world integration, bridging the gap between backend logic and data management.
 ## Project Structure
 
 - **src/main/java/app**: Main application logic and entry points.
